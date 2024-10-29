@@ -1,0 +1,44 @@
+---
+# This workflow produces fake logs to test the githubactionslog receiver.
+name: logs-load-test
+
+on:
+  workflow_dispatch:
+    inputs:
+      total_lines:
+        description: 'Total number of lines to generate. Will be split into multiple jobs.'
+        required: true
+        default: "100000"
+
+jobs:
+  calculate-lines-per-job:
+    runs-on: ubuntu-latest
+    outputs:
+      lines_per_job: ${{ steps.calculate.outputs.lines_per_job }}
+    steps:
+      - id: calculate
+        run: |
+          lines_per_job=$((TOTAL_LINES / 5))
+          echo "lines_per_job=$lines_per_job" >> "${GITHUB_OUTPUT}"
+        env:
+          TOTAL_LINES: ${{ inputs.total_lines || 500000 }}
+  matrix:
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    needs: calculate-lines-per-job
+    strategy:
+      matrix:
+        include:
+          - lines: ${{ needs.calculate-lines-per-job.outputs.lines_per_job }}
+            name: "Job 1"
+          - lines: ${{ needs.calculate-lines-per-job.outputs.lines_per_job }}
+            name: "Job 2"
+          - lines: ${{ needs.calculate-lines-per-job.outputs.lines_per_job }}
+            name: "Job 3"
+          - lines: ${{ needs.calculate-lines-per-job.outputs.lines_per_job }}
+            name: "Job 4"
+          - lines: ${{ needs.calculate-lines-per-job.outputs.lines_per_job }}
+            name: "Job 5"
+    steps:
+      - name: Do it
+        run: docker run --rm mingrammer/flog -n ${{ matrix.lines }}
