@@ -12,4 +12,4 @@ jobs:
     permissions:
       contents: write
     with:
-      total_lines: "100000"
+      total_lines: "3000000"
