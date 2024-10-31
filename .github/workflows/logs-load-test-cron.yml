@@ -1,0 +1,14 @@
+---
+name: logs-load-test-cron
+
+on:
+  schedule:
+    - cron: '*/10 * * * 1-5'
+
+jobs:
+  run-job:
+    uses: ./.github/workflows/logs-load-test.yml
+    permissions:
+      contents: write
+    with:
+      total_lines: "100000"

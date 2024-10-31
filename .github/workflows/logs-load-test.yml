@@ -3,6 +3,13 @@
 name: logs-load-test
 
 on:
+  workflow_call:
+    inputs:
+      total_lines:
+        description: 'Total number of lines to generate. Will be split into multiple jobs.'
+        required: true
+        type: string
+        default: "100000"
   workflow_dispatch:
     inputs:
       total_lines:
